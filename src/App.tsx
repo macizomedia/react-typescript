@@ -1,13 +1,13 @@
 import React, {
     useState,
     useEffect,
-    useReducer,
     useCallback,
     useRef,
 } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import { Navigation } from './Navigation'
+import { useAuth } from './useAuth'
 
 interface Country {
     name: string
@@ -36,11 +36,6 @@ const defaultState: State = {
     id: 0,
     token: '',
 }
-type ActionType =
-    | { type: 'REGISTER'; id?: number; password?: string; email?: string }
-    | { type: 'LOGIN'; password?: string; email?: string }
-    | { type: 'LOGOUT' }
-
 type FetchCountries<T> = T extends undefined ? Promise<Country[]> : void
 
 function fetchCollection<T extends undefined | ((data: Country[]) => void)>(
@@ -67,33 +62,23 @@ function pick<T extends object, U extends keyof T>(
     }
     return ret
 }
+/* 
 
-const authReducer = (state: State, action: ActionType): State => {
-    switch (action.type) {
-        case 'REGISTER':
-            return {
-                password: action.password,
-                email: action.email,
-                id: Math.floor(Math.random() * 13) + 1,
-                token: 'bird on a cage',
-            }
-        case 'LOGIN':
-            return {
-                password: action.password,
-                email: action.email,
-                token: 'authorized',
-            }
-        case 'LOGOUT':
-            return {
-                id: 0,
-            }
-        default:
-            return defaultState
-    }
-}
+const useAuth = (initialValue: boolean) => useState<boolean>(initialValue)
+
+type useAuthValue = ReturnType<typeof useAuth>[0]
+type setAuthValue = ReturnType<typeof useAuth>[1]
+
+const Logger: React.FunctionComponent<{
+    value: useAuthValue;
+    setValue: setAuthValue;
+}> = ({value, setValue}) => (
+    <button onClick={() => setValue(!value)}>Toggler</button>
+)
+
+ */
 
 function App() {
-    const [state, dispatch] = useReducer(authReducer, defaultState)
 
     const [isGuest, setIsGuest] = useState(true)
 
@@ -115,57 +100,79 @@ function App() {
     }, [])
     const emailInput = useRef<HTMLInputElement>(null)
     const passwordInput = useRef<HTMLInputElement>(null)
-    const loginUser = useCallback((e: { preventDefault(): void }) => {
-        e.preventDefault()
-        if (emailInput.current && passwordInput.current) {
-            dispatch({
-                type: 'LOGIN',
-                email: emailInput?.current?.value,
-                password: passwordInput?.current?.value,
-            })
-            setIsGuest(false)
-            emailInput.current.value = ''
-            passwordInput.current.value = ''
-        }
-    }, [])
-    const registerUser = useCallback((e: { preventDefault(): void }) => {
-        e.preventDefault()
-        if (emailInput.current && passwordInput.current) {
-            dispatch({
-                type: 'REGISTER',
-                email: emailInput?.current?.value,
-                password: passwordInput?.current?.value,
-            })
-            setIsGuest(false)
-            emailInput.current.value = ''
-            passwordInput.current.value = ''
-        }
-    }, [])
 
+    const {loginUser,logoutUser,registerUser,state} = useAuth(defaultState)
+
+    const login = useCallback((e: { preventDefault(): void }) => {
+        e.preventDefault()
+        if (emailInput.current && passwordInput.current) {
+            loginUser([emailInput?.current, passwordInput?.current])
+            setIsGuest(false)
+            emailInput.current.value = ''
+            passwordInput.current.value = ''
+        }
+    }, [loginUser])
+    const register = useCallback((e: { preventDefault(): void }) => {
+        e.preventDefault()
+        if (emailInput.current && passwordInput.current) {
+            registerUser(
+                [emailInput?.current,
+                passwordInput?.current]
+           )
+            setIsGuest(false)
+            emailInput.current.value = ''
+            passwordInput.current.value = ''
+        }
+    }, [registerUser])
+
+    if (state.token) {
+        return (
+            <div className="App">
+                <Navigation items={['Home', 'Blog']} />
+                <header id="app" className="App-header">
+                    <button onClick={logoutUser}>OUT</button>
+                    <pre style={{}}>{JSON.stringify(state, null, 2)}</pre>
+                    <pre>{JSON.stringify(data, null, 2)}</pre>
+                </header>
+            </div>
+        )
+    }
     return (
         <div className="App">
             <Navigation items={['Home', 'Blog']} />
             <header id="app" className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
-                <form onSubmit={isGuest ? registerUser : loginUser}>
-                    <input type="email" ref={emailInput} name="email" />
-                    <input type="password" ref={passwordInput} />
+                <form
+                    className="formContainer"
+                    onSubmit={isGuest ? register : login}
+                >
+                    <fieldset>
+                        <legend>Login Details</legend>
+                        <div className="container">
+                            <label htmlFor="email">
+                                <small>Email</small>
+                            </label>
+                            <input type="email" ref={emailInput} name="email" />
+                            <label htmlFor="password">
+                                <small>password</small>
+                            </label>
+                            <input type="password" ref={passwordInput} />
 
-                    <button type="submit">
-                        {isGuest ? 'register' : 'login'}
-                    </button>
-                    <a href="#app" >
-                        <p onClick={() => setIsGuest(!isGuest)}>
-                            <small>
-                                {isGuest
-                                    ? 'Already have an account'
-                                    : 'Register as new user'}
-                            </small>
-                        </p>
-                    </a>
+                            <button type="submit">
+                                {isGuest ? 'register' : 'login'}
+                            </button>
+                            <a href="#app">
+                                <p onClick={() => setIsGuest(!isGuest)}>
+                                    <small>
+                                        {isGuest
+                                            ? 'I already have an account'
+                                            : 'Register as new user'}
+                                    </small>
+                                </p>
+                            </a>
+                        </div>
+                    </fieldset>
                 </form>
-                <pre>{JSON.stringify(state, null, 2)}</pre>
-                <pre>{JSON.stringify(data, null, 2)}</pre>
             </header>
         </div>
     )

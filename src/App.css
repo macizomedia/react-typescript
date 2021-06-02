@@ -1,57 +1,106 @@
 .App {
-  text-align: center;
+    text-align: center;
 }
 
 .App-logo {
-  height: 40vmin;
-  pointer-events: none;
+    height: 40vmin;
+    pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    .App-logo {
+        animation: App-logo-spin infinite 20s linear;
+    }
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
 }
 
 @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-ul{
-
-  position: relative;
+input[type='email'],
+input[type='password'] {
+    width: 100%;
+    padding: 11px 3px;
+    margin: 3px 0;
+    display: inline-block;
+    box-sizing: border-box;
+}
+h1 {
+    text-align: center;
+    font-size: 14;
+}
+button:hover {
+    opacity: 0.8;
+}
+.formContainer {
+    text-align: left;
+    margin: 24px 50px 12px;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+    text-align: left;
+}
+ul {
+    position: relative;
 }
 #signIn {
-  position: absolute;
-  right: 2%;
+    position: absolute;
+    right: 2%;
 }
 
 form {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
+
+a {
+  font-size: 24px;
+  color: rgb(42, 121, 211);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  color: black;
+}
+
+a:visited {
+  color: rgb(61, 134, 182);
+}
+
+
 button {
-  flex-basis: auto;
-  margin: 0.7rem;
+    background-color: #3850619b;
+    color: rgb(211, 208, 208);
+    border: none;
+    cursor: pointer;
+    flex-basis: auto;
+    margin-top: 0.4rem;
+    padding: 0.6rem;
 }

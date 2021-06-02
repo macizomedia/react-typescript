@@ -9,27 +9,34 @@ const listStyle: Object = {
 export const Navigation: React.FunctionComponent<{
     items: string[]
     onClick?: (item: string) => void
-}> = ({ items, onClick }) => (
-    <div>
-        <ul
-            style={{
-                display: 'flex',
-            }}
-        >
-            {items.map((item, index) => (
-                <>
-                    <li
-                        style={listStyle}
-                        key={index}
-                        onClick={() => onClick?.(item)}
-                    >
-                        {item}
-                    </li>
-                </>
-            ))}
-            <li id="signIn" style={listStyle}>
-                <i className="fas fa-sign-in-alt" aria-hidden="true"></i>
-            </li>
-        </ul>
-    </div>
-)
+    handler?: (e: { preventDefault(): void }) => void
+}> = ({ items, onClick, handler }) => {
+    /* const logOut = useCallback(() => {
+        console.log('From Logout')
+    }, []) */
+
+    return (
+        <div>
+            <ul
+                style={{
+                    display: 'flex',
+                }}
+            >
+                {items.map((item, index) => (
+                    <>
+                        <li
+                            style={listStyle}
+                            key={item}
+                            onClick={() => onClick?.(item)}
+                        >
+                            {item}
+                        </li>
+                    </>
+                ))}
+                <li id="signIn" onClick={handler} style={listStyle}>
+                    <i className="fas fa-sign-in-alt" aria-hidden="true"></i>
+                </li>
+            </ul>
+        </div>
+    )
+}
