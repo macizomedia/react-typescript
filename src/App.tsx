@@ -1,13 +1,14 @@
-import React, {
-    useState,
-    useEffect,
-    useCallback,
-    useRef,
-} from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import { Navigation } from './Navigation'
-import { useAuth } from './useAuth'
+import {
+    useAuthState,
+    useLogin,
+    useLogout,
+    useRegister,
+    AuthProvider,
+} from './useAuth'
 
 interface Country {
     name: string
@@ -78,8 +79,34 @@ const Logger: React.FunctionComponent<{
 
  */
 
-function App() {
+function ListComponent<T>({
+    items,
+    render,
+    itemClick,
+}: React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLUListElement>,
+    HTMLUListElement
+> & {
+    items: T[] | null
+    render: (item: T) => React.ReactNode
+    itemClick: (item: T) => void
+}) {
+    return (
+        <ul>
+            {items?.map((item, index) => (
+                <li
+                    onClick={() => itemClick(item)}
+                    className="list"
+                    key={index}
+                >
+                    {render(item)}
+                </li>
+            ))}
+        </ul>
+    )
+}
 
+function App() {
     const [isGuest, setIsGuest] = useState(true)
 
     const [data, setData] = useState<Country[] | null>(null)
@@ -101,29 +128,36 @@ function App() {
     const emailInput = useRef<HTMLInputElement>(null)
     const passwordInput = useRef<HTMLInputElement>(null)
 
-    const {loginUser,logoutUser,registerUser,state} = useAuth(defaultState)
+    const loginUser = useLogin()
+    const logoutUser = useLogout()
+    const registerUser = useRegister()
 
-    const login = useCallback((e: { preventDefault(): void }) => {
-        e.preventDefault()
-        if (emailInput.current && passwordInput.current) {
-            loginUser([emailInput?.current, passwordInput?.current])
-            setIsGuest(false)
-            emailInput.current.value = ''
-            passwordInput.current.value = ''
-        }
-    }, [loginUser])
-    const register = useCallback((e: { preventDefault(): void }) => {
-        e.preventDefault()
-        if (emailInput.current && passwordInput.current) {
-            registerUser(
-                [emailInput?.current,
-                passwordInput?.current]
-           )
-            setIsGuest(false)
-            emailInput.current.value = ''
-            passwordInput.current.value = ''
-        }
-    }, [registerUser])
+    const state = useAuthState()
+
+    const login = useCallback(
+        (e: { preventDefault(): void }) => {
+            e.preventDefault()
+            if (emailInput.current && passwordInput.current) {
+                loginUser([emailInput?.current, passwordInput?.current])
+                setIsGuest(false)
+                emailInput.current.value = ''
+                passwordInput.current.value = ''
+            }
+        },
+        [loginUser]
+    )
+    const register = useCallback(
+        (e: { preventDefault(): void }) => {
+            e.preventDefault()
+            if (emailInput.current && passwordInput.current) {
+                registerUser([emailInput?.current, passwordInput?.current])
+                setIsGuest(false)
+                emailInput.current.value = ''
+                passwordInput.current.value = ''
+            }
+        },
+        [registerUser]
+    )
 
     if (state.token) {
         return (
@@ -131,8 +165,17 @@ function App() {
                 <Navigation items={['Home', 'Blog']} />
                 <header id="app" className="App-header">
                     <button onClick={logoutUser}>OUT</button>
+                    <ListComponent
+                        items={data}
+                        itemClick={(item) => alert(item.population)}
+                        render={(country) => (
+                            <>
+                                {country.capital}
+                                {/* <pre>{JSON.stringify(country, null, 2)}</pre> */}
+                            </>
+                        )}
+                    />
                     <pre style={{}}>{JSON.stringify(state, null, 2)}</pre>
-                    <pre>{JSON.stringify(data, null, 2)}</pre>
                 </header>
             </div>
         )
@@ -178,4 +221,10 @@ function App() {
     )
 }
 
-export default App
+const AuthWrapper = () => (
+    <AuthProvider initialState={defaultState}>
+        <App />
+    </AuthProvider>
+)
+
+export default AuthWrapper

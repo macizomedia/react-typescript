@@ -1,5 +1,9 @@
-import { useReducer, useCallback } from 'react'
-
+import React, {
+    useReducer,
+    useCallback,
+    createContext,
+    useContext,
+} from 'react'
 interface State {
     id?: number
     email?: string
@@ -19,17 +23,20 @@ type ActionType =
     | { type: 'LOGIN'; password?: string; email?: string }
     | { type: 'LOGOUT' }
 
+type useAuthStateType = ReturnType<typeof useAuth>
 
-/* EXPORTED FUNCTION ARG >> InitialState & Ref */
+const AuthContext = createContext<useAuthStateType>({
+    state: defaultState,
+    loginUser: () => {},
+    registerUser: () => {},
+    logoutUser: () => {},
+})
 
-
-export function useAuth(
-    initialState: State,
-): {
+export function useAuth(initialState: State): {
     state: State
     loginUser: (ref: HTMLInputElement[]) => void
     registerUser: (ref: HTMLInputElement[]) => void
-    logoutUser: (e: { preventDefault(): void } ) => void
+    logoutUser: (e: { preventDefault(): void }) => void
 } {
     const [state, dispatch] = useReducer(
         (state: State, action: ActionType): State => {
@@ -59,27 +66,21 @@ export function useAuth(
         initialState
     )
 
-    const loginUser = useCallback(
-        ( ref: HTMLInputElement[]) => {
-            dispatch({
-                type: 'LOGIN',
-                email: ref[0].value,
-                password: ref[1].value,
-            })
-        },
-        []
-    )
+    const loginUser = useCallback((ref: HTMLInputElement[]) => {
+        dispatch({
+            type: 'LOGIN',
+            email: ref[0].value,
+            password: ref[1].value,
+        })
+    }, [])
 
-    const registerUser = useCallback(
-        (ref: HTMLInputElement[]) => {
-            dispatch({
-                type: 'REGISTER',
-                email: ref[0].value,
-                password: ref[1].value,
-            })
-        },
-        []
-    )
+    const registerUser = useCallback((ref: HTMLInputElement[]) => {
+        dispatch({
+            type: 'REGISTER',
+            email: ref[0].value,
+            password: ref[1].value,
+        })
+    }, [])
     const logoutUser = useCallback((e: { preventDefault(): void }) => {
         e.preventDefault()
         dispatch({
@@ -88,4 +89,32 @@ export function useAuth(
     }, [])
 
     return { state, loginUser, registerUser, logoutUser }
+}
+
+export const AuthProvider: React.FunctionComponent<{
+    initialState: State
+}> = ({ initialState, children }) => (
+    <AuthContext.Provider value={useAuth(initialState)}>
+        {children}
+    </AuthContext.Provider>
+)
+
+export const useAuthState = (): State => {
+    const { state } = useContext(AuthContext)
+    return state
+}
+
+export const useRegister = (): useAuthStateType['registerUser'] => {
+    const { registerUser } = useContext(AuthContext)
+    return registerUser
+}
+
+export const useLogin = (): useAuthStateType['loginUser'] => {
+    const { loginUser } = useContext(AuthContext)
+    return loginUser
+}
+
+export const useLogout = (): useAuthStateType['logoutUser'] => {
+    const { logoutUser } = useContext(AuthContext)
+    return logoutUser
 }
