@@ -19,8 +19,8 @@ const defaultState: State = {
 }
 
 type ActionType =
-    | { type: 'REGISTER'; id?: number; password?: string; email?: string }
-    | { type: 'LOGIN'; password?: string; email?: string }
+    | { type: 'REGISTER'; id: number; password: string; email: string }
+    | { type: 'LOGIN'; password: string; email: string }
     | { type: 'LOGOUT' }
 
 type useAuthStateType = ReturnType<typeof useAuth>
@@ -75,8 +75,9 @@ export function useAuth(initialState: State): {
     }, [])
 
     const registerUser = useCallback((ref: HTMLInputElement[]) => {
-        dispatch({
+        return dispatch({
             type: 'REGISTER',
+            id: 0,
             email: ref[0].value,
             password: ref[1].value,
         })

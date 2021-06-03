@@ -2,6 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import { Navigation } from './Navigation'
+import { UseStateComponent } from './UseStateComponent'
+import UseEffectComponent from './UseEffectComponent'
+import CustomHookComponent from './CustomHookComponent'
 import {
     useAuthState,
     useLogin,
@@ -164,6 +167,8 @@ function App() {
             <div className="App">
                 <Navigation items={['Home', 'Blog']} />
                 <header id="app" className="App-header">
+                    <UseStateComponent />
+                    <CustomHookComponent />
                     <button onClick={logoutUser}>OUT</button>
                     <ListComponent
                         items={data}
@@ -184,6 +189,7 @@ function App() {
         <div className="App">
             <Navigation items={['Home', 'Blog']} />
             <header id="app" className="App-header">
+                <UseEffectComponent />
                 <img src={logo} className="App-logo" alt="logo" />
                 <form
                     className="formContainer"
