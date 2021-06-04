@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const listStyle: Object = {
     padding: '1rem',
@@ -29,11 +30,12 @@ export const Navigation: React.FunctionComponent<{
                             key={item}
                             onClick={() => onClick?.(item)}
                         >
-                            {item}
+                          
+                            <Link to={`/${item}`}>  {item}</Link>
                         </li>
                     </>
                 ))}
-                <li id="signIn" onClick={handler} style={listStyle}>
+                <li id="signIn" onClick={() => handler} style={listStyle}>
                     <i className="fas fa-sign-in-alt" aria-hidden="true"></i>
                 </li>
             </ul>

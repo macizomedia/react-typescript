@@ -1,6 +1,13 @@
 {
-    "cSpell.words": [
-        "Wisokyburgh",
-        "zipcode"
-    ]
+    "cSpell.words": ["Wisokyburgh", "childs", "zipcode"],
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": false,
+    },
+    "workbench.colorCustomizations": {
+        "[YOUR_COLOR_SCHEME_NAME]": {
+            "editorSuggestWidget.selectedBackground": "#ff00005e"
+        }
+    }
 }
