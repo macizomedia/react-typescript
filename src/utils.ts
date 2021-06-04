@@ -1,8 +1,7 @@
 export type Constructor<T> = new (...args: any[]) => T
 
-export {}
 
-export function createInMemoryDatabase<T>() {
+function createInMemoryDatabase<T>() {
     return class memoryDatabase {
         private db: Record<string, T> = {}
 
@@ -22,7 +21,7 @@ export function createInMemoryDatabase<T>() {
 
 const stringDatabase = createInMemoryDatabase<string>()
 
-export const dbStr = new stringDatabase()
+const dbStr = new stringDatabase()
 
 dbStr.set('one', 'first log')
 

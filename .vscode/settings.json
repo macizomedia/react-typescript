@@ -1,5 +1,11 @@
 {
-    "cSpell.words": ["Wisokyburgh", "childs", "zipcode"],
+    "cSpell.words": [
+        "Wisokyburgh",
+        "browserslist",
+        "childs",
+        "typicode",
+        "zipcode"
+    ],
     "editor.quickSuggestions": {
         "other": true,
         "comments": false,

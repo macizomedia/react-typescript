@@ -1,3 +1,4 @@
+import { users } from './db'
 import React, {
     useReducer,
     useCallback,
@@ -5,16 +6,18 @@ import React, {
     useContext,
 } from 'react'
 interface State {
-    id?: number
+    key?: string
     email?: string
     password?: string
+    status?: boolean
     token?: string
 }
 
 const defaultState: State = {
     email: 'Guest',
     password: '',
-    id: 0,
+    status: false,
+    key: "00",
     token: '',
 }
 
@@ -46,7 +49,8 @@ export function useAuth(initialState: State): {
                         ...state,
                         password: action.password,
                         email: action.email,
-                        id: Math.floor(Math.random() * 13) + 1,
+                        status: true,
+                        key: String(Math.floor(Math.random() * 13) + 1),
                         token: 'bird on a cage',
                     }
                 case 'LOGIN':
@@ -67,6 +71,12 @@ export function useAuth(initialState: State): {
     )
 
     const loginUser = useCallback((ref: HTMLInputElement[]) => {
+        users.push({
+            key:'arepa',
+            password: ref[1].value,
+            username: ref[0].value,
+            status: true
+        })
         dispatch({
             type: 'LOGIN',
             email: ref[0].value,
