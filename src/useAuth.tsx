@@ -1,4 +1,3 @@
-import { users } from './db'
 import React, {
     useReducer,
     useCallback,
@@ -71,12 +70,6 @@ export function useAuth(initialState: State): {
     )
 
     const loginUser = useCallback((ref: HTMLInputElement[]) => {
-        users.push({
-            key:'arepa',
-            password: ref[1].value,
-            username: ref[0].value,
-            status: true
-        })
         dispatch({
             type: 'LOGIN',
             email: ref[0].value,

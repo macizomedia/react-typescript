@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "ES2017",
-        "lib": ["dom", "dom.iterable", "esnext", "es7"],
+        "lib": ["dom", "dom.iterable", "esnext", "es7","ES2015"],
         "declaration": true,
         "allowJs": true,
         "skipLibCheck": true,
@@ -17,5 +17,6 @@
         "noEmit": true,
         "jsx": "react-jsx"
     },
-    "include": ["src"]
+    "include": ["src/**/*"],
+    "exclude": ["src/types/*.ts", "node_modules", ".vscode"]
 }
