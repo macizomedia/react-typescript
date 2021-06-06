@@ -8,6 +8,7 @@ import Slider from './Slider'
 import { useAuthState, useLogout, AuthProvider } from './useAuth'
 import './App.css'
 import Authentication from './Authentication'
+//import UserContentComponent from './UserContentComponent'
 interface State {
     id?: number
     email?: string
@@ -15,22 +16,30 @@ interface State {
     token?: string
 }
 
+const item = window.localStorage.getItem('currentUser')
+let user = item ? JSON.parse(item) : null
+console.log(user)
 const defaultState: State = {
-    email: 'Guest',
-    password: '',
-    id: 0,
-    token: '',
+    email: user.email || 'Guest',
+    password: user.password || '',
+    id: user.id,
+    token: user.token || '',
 }
 
 function App() {
     const logoutUser = useLogout()
 
     const state = useAuthState()
-
+    console.log(state)
     if (state.token) {
         return (
             <div className="App">
                 <header id="app" className="App-header">
+                    <pre style={{}}>{`Welcome ${JSON.stringify(
+                        state,
+                        null,
+                        2
+                    )}`}</pre>
                     <button onClick={logoutUser}>OUT</button>
                     <Slider preview={'list of Users'}>
                         <CustomHookComponent />
@@ -38,7 +47,6 @@ function App() {
                     </Slider>
                     <Slider preview={'A list of Capital Cities'}>
                         <ContentComponent />
-                        <pre style={{}}>{JSON.stringify(state, null, 2)}</pre>
                     </Slider>
                 </header>
             </div>
@@ -57,3 +65,12 @@ const AuthWrapper = () => (
 )
 
 export default AuthWrapper
+
+/* function api<T>(url: string): Promise<T> {
+    return fetch(url).then((response) => {
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+        return response.json()
+    })
+} */

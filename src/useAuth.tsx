@@ -4,25 +4,48 @@ import React, {
     createContext,
     useContext,
 } from 'react'
+import axios from 'axios'
+
+let endpoint = 'http://localhost:4000/'
+
+const config = {
+    headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+    },
+}
 interface State {
-    key?: string
+    id?: number
     email?: string
     password?: string
     status?: boolean
     token?: string
 }
 
+function jsonRoundTrip<T>(x: T) {
+    return JSON.parse(JSON.stringify(x))
+}
+
+let user = localStorage.getItem('currentUser')
+    ? jsonRoundTrip('currentUser')
+    : ''
+
 const defaultState: State = {
-    email: 'Guest',
-    password: '',
+    email: user.email || 'Guest',
+    password: user.password || '',
     status: false,
-    key: "00",
-    token: '',
+    id: 1,
+    token: user.token || '',
 }
 
 type ActionType =
-    | { type: 'REGISTER'; id: number; password: string; email: string }
-    | { type: 'LOGIN'; password: string; email: string }
+    | {
+          type: 'REGISTER'
+          id: number
+          password: string
+          email: string
+          token: string
+      }
+    | { type: 'LOGIN'; password: string; email: string; token: string }
     | { type: 'LOGOUT' }
 
 type useAuthStateType = ReturnType<typeof useAuth>
@@ -49,14 +72,15 @@ export function useAuth(initialState: State): {
                         password: action.password,
                         email: action.email,
                         status: true,
-                        key: String(Math.floor(Math.random() * 13) + 1),
-                        token: 'bird on a cage',
+                        id: Math.floor(Math.random() * 13) + 1,
+                        token: action.token,
                     }
                 case 'LOGIN':
                     return {
+                        ...state,
                         password: action.password,
                         email: action.email,
-                        token: 'authorized',
+                        token: action.token,
                     }
                 case 'LOGOUT':
                     return {
@@ -70,19 +94,35 @@ export function useAuth(initialState: State): {
     )
 
     const loginUser = useCallback((ref: HTMLInputElement[]) => {
-        dispatch({
-            type: 'LOGIN',
-            email: ref[0].value,
-            password: ref[1].value,
+        let body = { email: ref[0].value, password: ref[1].value }
+        let response = axios.post(endpoint + 'users/login', body, config)
+        response.then((result) => {
+            if (result.data) {
+                dispatch({
+                    type: 'LOGIN',
+                    email: result.data.email,
+                    password: result.data.password,
+                    token: result.data.token,
+                })
+                localStorage.setItem('currentUser', JSON.stringify(result.data))
+            }
         })
     }, [])
 
     const registerUser = useCallback((ref: HTMLInputElement[]) => {
-        return dispatch({
-            type: 'REGISTER',
-            id: 0,
-            email: ref[0].value,
-            password: ref[1].value,
+        let body = { email: ref[0].value, password: ref[1].value }
+        let response = axios.post(endpoint + 'users/new', body, config)
+        response.then((result) => {
+            if (result.data) {
+                dispatch({
+                    type: 'REGISTER',
+                    id: 0,
+                    email: result.data.email,
+                    password: result.data.password,
+                    token: result.data.token,
+                })
+                localStorage.setItem('currentUser', JSON.stringify(result.data))
+            }
         })
     }, [])
     const logoutUser = useCallback((e: { preventDefault(): void }) => {
@@ -90,6 +130,7 @@ export function useAuth(initialState: State): {
         dispatch({
             type: 'LOGOUT',
         })
+        localStorage.removeItem('currentUser')
     }, [])
 
     return { state, loginUser, registerUser, logoutUser }
