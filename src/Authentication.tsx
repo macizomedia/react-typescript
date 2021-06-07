@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react'
-import { useLogin, useRegister } from './useAuth'
+import { useAuthState, useLogin, useRegister } from './useAuth'
 
 function Authentication() {
     const [isGuest, setIsGuest] = useState(true)
@@ -8,6 +8,8 @@ function Authentication() {
 
     const loginUser = useLogin()
     const registerUser = useRegister()
+
+    const state = useAuthState()
 
     const login = useCallback(
         (e: { preventDefault(): void }) => {
@@ -33,6 +35,7 @@ function Authentication() {
         },
         [registerUser]
     )
+
     return (
         <div className="App">
             <header id="app" className="App-header">
@@ -41,30 +44,51 @@ function Authentication() {
                     onSubmit={isGuest ? register : login}
                 >
                     <fieldset>
-                        <legend>Login Details</legend>
-                        <div className="container">
-                            <label htmlFor="email">
-                                <small>Email</small>
-                            </label>
-                            <input type="email" ref={emailInput} name="email" />
-                            <label htmlFor="password">
-                                <small>password</small>
-                            </label>
-                            <input type="password" ref={passwordInput} />
+                        <legend>{isGuest ? 'Register' : 'Login'}</legend>
+                        {state.message ? (
+                            <div className="error">
+                                <p>{state.message}</p>
+                                <a href="/restore">
+                                    <small>Restore Password</small>
+                                </a>
+                                <a href="/">
+                                    <small>Try Again</small>
+                                </a>
+                            </div>
+                        ) : (
+                            <div className="container">
+                                <label htmlFor="email">
+                                    <small>Email</small>
+                                </label>
+                                <input
+                                    type="email"
+                                    ref={emailInput}
+                                    name="email"
+                                    required
+                                />
+                                <label htmlFor="password">
+                                    <small>password</small>
+                                </label>
+                                <input
+                                    type="password"
+                                    ref={passwordInput}
+                                    required
+                                />
 
-                            <button type="submit">
-                                {isGuest ? 'register' : 'login'}
-                            </button>
-                            <a href="#app">
-                                <p onClick={() => setIsGuest(!isGuest)}>
-                                    <small>
-                                        {isGuest
-                                            ? 'I already have an account'
-                                            : 'Register as new user'}
-                                    </small>
-                                </p>
-                            </a>
-                        </div>
+                                <button type="submit">
+                                    {isGuest ? 'register' : 'login'}
+                                </button>
+                                <a href="#app">
+                                    <p onClick={() => setIsGuest(!isGuest)}>
+                                        <small>
+                                            {isGuest
+                                                ? 'I already have an account'
+                                                : 'Register as new user'}
+                                        </small>
+                                    </p>
+                                </a>
+                            </div>
+                        )}
                     </fieldset>
                 </form>
             </header>

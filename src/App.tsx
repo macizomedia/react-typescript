@@ -17,13 +17,13 @@ interface State {
 }
 
 const item = window.localStorage.getItem('currentUser')
-let user = item ? JSON.parse(item) : null
+let user = item ? JSON.parse(item) : undefined
 console.log(user)
 const defaultState: State = {
-    email: user.email || 'Guest',
-    password: user.password || '',
-    id: user.id,
-    token: user.token || '',
+    email: user?.email || 'Guest',
+    password: user?.password || '',
+    id: user?.id,
+    token: user?.token || '',
 }
 
 function App() {
@@ -35,11 +35,7 @@ function App() {
         return (
             <div className="App">
                 <header id="app" className="App-header">
-                    <pre style={{}}>{`Welcome ${JSON.stringify(
-                        state,
-                        null,
-                        2
-                    )}`}</pre>
+                    {state.email}
                     <button onClick={logoutUser}>OUT</button>
                     <Slider preview={'list of Users'}>
                         <CustomHookComponent />

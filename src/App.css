@@ -111,3 +111,8 @@ button {
     margin-top: 0.4rem;
     padding: 0.6rem;
 }
+.error {
+    color: 'red';
+    display: flex;
+    flex-direction: column;
+}

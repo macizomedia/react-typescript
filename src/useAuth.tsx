@@ -19,22 +19,15 @@ interface State {
     password?: string
     status?: boolean
     token?: string
+    message?: string
 }
-
-function jsonRoundTrip<T>(x: T) {
-    return JSON.parse(JSON.stringify(x))
-}
-
-let user = localStorage.getItem('currentUser')
-    ? jsonRoundTrip('currentUser')
-    : ''
 
 const defaultState: State = {
-    email: user.email || 'Guest',
-    password: user.password || '',
+    email: 'Guest',
+    password: '',
     status: false,
     id: 1,
-    token: user.token || '',
+    token: '',
 }
 
 type ActionType =
@@ -45,7 +38,14 @@ type ActionType =
           email: string
           token: string
       }
-    | { type: 'LOGIN'; password: string; email: string; token: string }
+    | {
+          type: 'LOGIN'
+          id: string
+          password: string
+          email: string
+          token: string
+      }
+    | { type: 'ERROR'; message: string }
     | { type: 'LOGOUT' }
 
 type useAuthStateType = ReturnType<typeof useAuth>
@@ -86,6 +86,10 @@ export function useAuth(initialState: State): {
                     return {
                         token: '',
                     }
+                case 'ERROR':
+                    return {
+                        message: action.message,
+                    }
                 default:
                     return defaultState
             }
@@ -97,14 +101,19 @@ export function useAuth(initialState: State): {
         let body = { email: ref[0].value, password: ref[1].value }
         let response = axios.post(endpoint + 'users/login', body, config)
         response.then((result) => {
-            if (result.data) {
+            if (result.data.token) {
+                console.log('LOGIN')
                 dispatch({
                     type: 'LOGIN',
+                    id: result.data.id,
                     email: result.data.email,
                     password: result.data.password,
                     token: result.data.token,
                 })
                 localStorage.setItem('currentUser', JSON.stringify(result.data))
+            } else {
+                console.log(result.data.msg)
+                dispatch({ type: 'ERROR', message: 'invalid credentials' })
             }
         })
     }, [])

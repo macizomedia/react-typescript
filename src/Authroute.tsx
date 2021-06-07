@@ -1,6 +1,5 @@
 import { RouteComponentProps, Route, Redirect } from 'react-router-dom';
 
-
 interface Props {
 	Component: React.FC<RouteComponentProps>
 	path: string;
