@@ -4,11 +4,11 @@ interface Props {
 	Component: React.FC<RouteComponentProps>
 	path: string;
 	exact?: boolean;
+	isAuth: boolean
 };
 
 
-const AuthRoute = ({ Component, path, exact = false }: Props): JSX.Element => {
-	const isAuth = true
+const AuthRoute = ({ Component, path, exact = false, isAuth}: Props): JSX.Element => {
 	const message = 'Please log in to view this page'
 	return (
 		<Route

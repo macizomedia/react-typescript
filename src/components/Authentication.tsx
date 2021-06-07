@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react'
-import { useAuthState, useLogin, useRegister } from './useAuth'
+import { useAuthState, useLogin, useRegister } from '../useAuth'
 
 function Authentication() {
     const [isGuest, setIsGuest] = useState(true)

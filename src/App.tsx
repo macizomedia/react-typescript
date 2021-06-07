@@ -1,64 +1,69 @@
 import React from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import { Navigation } from './Navigation'
+import { BrowserRouter as Router, Route, useHistory } from 'react-router-dom'
+import { Navigation } from './components/Navigation'
 import { UseStateComponent } from './UseStateComponent'
-import CustomHookComponent from './CustomHookComponent'
-import ContentComponent from './ContentComponent'
-import Slider from './Slider'
+import CustomHookComponent from './components/CustomHookComponent'
+import ContentComponent from './components/ContentComponent'
+import Slider from './components/Slider'
 import { useAuthState, useLogout, AuthProvider } from './useAuth'
+import Authentication from './components/Authentication'
+import AuthRoute from './Authroute'
 import './App.css'
-import Authentication from './Authentication'
 //import UserContentComponent from './UserContentComponent'
 interface State {
     id?: number
     email?: string
     password?: string
     token?: string
+    status?: boolean
 }
 
 const item = window.localStorage.getItem('currentUser')
 let user = item ? JSON.parse(item) : undefined
-console.log(user)
 const defaultState: State = {
     email: user?.email || 'Guest',
     password: user?.password || '',
     id: user?.id,
     token: user?.token || '',
+    status: user?.status || false,
 }
 
 function App() {
     const logoutUser = useLogout()
 
-    const state = useAuthState()
-    console.log(state)
-    if (state.token) {
-        return (
-            <div className="App">
-                <header id="app" className="App-header">
-                    {state.email}
-                    <button onClick={logoutUser}>OUT</button>
-                    <Slider preview={'list of Users'}>
-                        <CustomHookComponent />
-                        <UseStateComponent />
-                    </Slider>
-                    <Slider preview={'A list of Capital Cities'}>
-                        <ContentComponent />
-                    </Slider>
-                </header>
-            </div>
-        )
-    }
-    return <Authentication />
+    return (
+        <div className="App">
+            <header id="app" className="App-header">
+                <button onClick={logoutUser}>OUT</button>
+                <Slider preview={'list of Users'}>
+                    <CustomHookComponent />
+                    <UseStateComponent />
+                </Slider>
+                <Slider preview={'A list of Capital Cities'}>
+                    <ContentComponent />
+                </Slider>
+            </header>
+        </div>
+    )
 }
 
-const AuthWrapper = () => (
-    <Router>
-        <AuthProvider initialState={defaultState}>
-            <Navigation items={['Home', 'Blog']} />
-            <Route path="/" exact component={App}></Route>
-        </AuthProvider>
-    </Router>
-)
+const AuthWrapper = () => {
+    
+    return (
+        <Router>
+            <AuthProvider initialState={defaultState}>
+                <Navigation items={['Home', 'Blog']} />
+                <AuthRoute
+                    path="/"
+                    exact
+                    Component={App}
+                    isAuth={false}
+                />
+                <Route path="/login" exact component={Authentication} />
+            </AuthProvider>
+        </Router>
+    )
+}
 
 export default AuthWrapper
 

@@ -37,6 +37,7 @@ type ActionType =
           password: string
           email: string
           token: string
+          status: boolean
       }
     | {
           type: 'LOGIN'
@@ -44,6 +45,7 @@ type ActionType =
           password: string
           email: string
           token: string
+          status: boolean
       }
     | { type: 'ERROR'; message: string }
     | { type: 'LOGOUT' }
@@ -71,7 +73,7 @@ export function useAuth(initialState: State): {
                         ...state,
                         password: action.password,
                         email: action.email,
-                        status: true,
+                        status: action.status,
                         id: Math.floor(Math.random() * 13) + 1,
                         token: action.token,
                     }
@@ -80,11 +82,14 @@ export function useAuth(initialState: State): {
                         ...state,
                         password: action.password,
                         email: action.email,
+                        status: action.status,
                         token: action.token,
                     }
                 case 'LOGOUT':
                     return {
+                        ...state,
                         token: '',
+                        status: false,
                     }
                 case 'ERROR':
                     return {
@@ -109,6 +114,7 @@ export function useAuth(initialState: State): {
                     email: result.data.email,
                     password: result.data.password,
                     token: result.data.token,
+                    status: true
                 })
                 localStorage.setItem('currentUser', JSON.stringify(result.data))
             } else {
@@ -129,6 +135,7 @@ export function useAuth(initialState: State): {
                     email: result.data.email,
                     password: result.data.password,
                     token: result.data.token,
+                    status: true
                 })
                 localStorage.setItem('currentUser', JSON.stringify(result.data))
             }
