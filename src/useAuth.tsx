@@ -114,7 +114,7 @@ export function useAuth(initialState: State): {
                     email: result.data.email,
                     password: result.data.password,
                     token: result.data.token,
-                    status: true
+                    status: true,
                 })
                 localStorage.setItem('currentUser', JSON.stringify(result.data))
             } else {
@@ -135,7 +135,7 @@ export function useAuth(initialState: State): {
                     email: result.data.email,
                     password: result.data.password,
                     token: result.data.token,
-                    status: true
+                    status: true,
                 })
                 localStorage.setItem('currentUser', JSON.stringify(result.data))
             }

@@ -1,15 +1,10 @@
 import React from 'react'
-import { BrowserRouter as Router, Route, useHistory } from 'react-router-dom'
+import { BrowserRouter as Router, Switch } from 'react-router-dom'
 import { Navigation } from './components/Navigation'
-import { UseStateComponent } from './UseStateComponent'
-import CustomHookComponent from './components/CustomHookComponent'
-import ContentComponent from './components/ContentComponent'
-import Slider from './components/Slider'
-import { useAuthState, useLogout, AuthProvider } from './useAuth'
-import Authentication from './components/Authentication'
+import { AuthProvider } from './useAuth'
 import AuthRoute from './Authroute'
+import Routes from './routes'
 import './App.css'
-//import UserContentComponent from './UserContentComponent'
 interface State {
     id?: number
     email?: string
@@ -28,44 +23,28 @@ const defaultState: State = {
     status: user?.status || false,
 }
 
-function App() {
-    const logoutUser = useLogout()
-
-    return (
-        <div className="App">
-            <header id="app" className="App-header">
-                <button onClick={logoutUser}>OUT</button>
-                <Slider preview={'list of Users'}>
-                    <CustomHookComponent />
-                    <UseStateComponent />
-                </Slider>
-                <Slider preview={'A list of Capital Cities'}>
-                    <ContentComponent />
-                </Slider>
-            </header>
-        </div>
-    )
-}
-
-const AuthWrapper = () => {
-    
+const App = () => {
     return (
         <Router>
             <AuthProvider initialState={defaultState}>
-                <Navigation items={['Home', 'Blog']} />
-                <AuthRoute
-                    path="/"
-                    exact
-                    Component={App}
-                    isAuth={false}
-                />
-                <Route path="/login" exact component={Authentication} />
+                <Navigation items={['Home', 'login']} />
+                <Switch>
+                    {Routes.map((route) => (
+                        <AuthRoute
+                            key={route.path}
+                            path={route.path}
+                            isPrivate={route.isPrivate}
+                            exact
+                            Component={route.component}
+                        />
+                    ))}
+                </Switch>
             </AuthProvider>
         </Router>
     )
 }
 
-export default AuthWrapper
+export default App
 
 /* function api<T>(url: string): Promise<T> {
     return fetch(url).then((response) => {
