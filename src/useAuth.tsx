@@ -6,7 +6,7 @@ import React, {
 } from 'react'
 import axios from 'axios'
 
-let endpoint = 'http://localhost:4000/'
+let endpoint = 'https://voterookieapi.azurewebsites.net/api/v1/'
 
 const config = {
     headers: {
@@ -16,37 +16,47 @@ const config = {
 interface State {
     id?: number
     email?: string
+    phone?: string
     password?: string
-    status?: boolean
+    verify?: boolean
     token?: string
     message?: string
+    settings?: {}
+    project?: []
 }
 
 const defaultState: State = {
     email: 'Guest',
     password: '',
-    status: false,
+    verify: false,
     id: 1,
     token: '',
 }
 
 type ActionType =
     | {
-          type: 'REGISTER'
-          id: number
-          password: string
-          email: string
-          token: string
-          status: boolean
-      }
+        type: 'SUBSCRIBE'
+        id: number
+        email: string
+        phone: string
+        verify: boolean
+    }
     | {
-          type: 'LOGIN'
-          id: string
-          password: string
-          email: string
-          token: string
-          status: boolean
-      }
+        type: 'REGISTER'
+        id: number
+        password: string
+        email: string
+        token: string
+        status: boolean
+    }
+    | {
+        type: 'LOGIN'
+        id: string
+        password: string
+        email: string
+        token: string
+        status: boolean
+    }
     | { type: 'ERROR'; message: string }
     | { type: 'LOGOUT' }
 
@@ -54,26 +64,35 @@ type useAuthStateType = ReturnType<typeof useAuth>
 
 const AuthContext = createContext<useAuthStateType>({
     state: defaultState,
-    loginUser: () => {},
-    registerUser: () => {},
-    logoutUser: () => {},
+    subscribeUser: () => { },
+    loginUser: () => { },
+    registerUser: () => { },
+    logoutUser: () => { },
 })
 
 export function useAuth(initialState: State): {
     state: State
     loginUser: (ref: HTMLInputElement[]) => void
+    subscribeUser: (data: State) => void
     registerUser: (ref: HTMLInputElement[]) => void
     logoutUser: (e: { preventDefault(): void }) => void
 } {
     const [state, dispatch] = useReducer(
         (state: State, action: ActionType): State => {
             switch (action.type) {
+                case 'SUBSCRIBE':
+                    return {
+                        ...state,
+                        email: action.email,
+                        phone: action.phone,
+                        verify: action.verify,
+                        id: Math.floor(Math.random() * 13) + 1,
+                    }
                 case 'REGISTER':
                     return {
                         ...state,
                         password: action.password,
                         email: action.email,
-                        status: action.status,
                         id: Math.floor(Math.random() * 13) + 1,
                         token: action.token,
                     }
@@ -82,14 +101,12 @@ export function useAuth(initialState: State): {
                         ...state,
                         password: action.password,
                         email: action.email,
-                        status: action.status,
                         token: action.token,
                     }
                 case 'LOGOUT':
                     return {
                         ...state,
                         token: '',
-                        status: false,
                     }
                 case 'ERROR':
                     return {
@@ -101,6 +118,27 @@ export function useAuth(initialState: State): {
         },
         initialState
     )
+
+    const subscribeUser = useCallback((data) => {
+        let body = { data }
+        let response = axios.post(endpoint + 'users/subscribe', body, config)
+        response.then((result) => {
+            if (result.data) {
+                console.log('SUBSCRIBE')
+                dispatch({
+                    type: 'SUBSCRIBE',
+                    id: result.data.user.id,
+                    phone: result.data.user.phone,
+                    email: result.data.user.email,
+                    verify: false,
+                })
+                console.log("d", result.data)
+            } else {
+                console.log(result.data)
+                dispatch({ type: 'ERROR', message: 'invalid credentials' })
+            }
+        })
+    }, [])
 
     const loginUser = useCallback((ref: HTMLInputElement[]) => {
         let body = { email: ref[0].value, password: ref[1].value }
@@ -149,7 +187,7 @@ export function useAuth(initialState: State): {
         localStorage.removeItem('currentUser')
     }, [])
 
-    return { state, loginUser, registerUser, logoutUser }
+    return { state, subscribeUser, loginUser, registerUser, logoutUser }
 }
 
 export const AuthProvider: React.FunctionComponent<{
@@ -163,6 +201,11 @@ export const AuthProvider: React.FunctionComponent<{
 export const useAuthState = (): State => {
     const { state } = useContext(AuthContext)
     return state
+}
+
+export const useSubscribe = (): useAuthStateType['subscribeUser'] => {
+    const { subscribeUser } = useContext(AuthContext)
+    return subscribeUser
 }
 
 export const useRegister = (): useAuthStateType['registerUser'] => {

@@ -1,5 +1,7 @@
-import { RouteComponentProps, Route, Redirect } from 'react-router-dom'
-import { useAuthState } from './useAuth'
+import React, { useContext } from 'react'
+import { RouteComponentProps, Route } from 'react-router-dom'
+import { SessionContext } from './sessions'
+import { Welcome } from './views/Welcome'
 
 interface Props {
     Component: React.FC<RouteComponentProps>
@@ -15,28 +17,18 @@ const AuthRoute = ({
     isPrivate,
     ...rest
 }: Props): JSX.Element => {
-    const { token } = useAuthState()
-    const message = 'Please log in to view this page'
+    const { session } = useContext(SessionContext)
     return (
-        <Route
-            exact={exact}
-            path={path}
-            render={(props: RouteComponentProps) =>
-                isPrivate && !Boolean(token) ? (
-                    <Redirect
-                        to={{
-                            pathname: '/login',
-                            state: {
-                                message,
-                                requestedPath: path,
-                            },
-                        }}
-                    />
-                ) : (
-                    <Component {...props} />
-                )
-            }
-        />
+        <>
+            {isPrivate && !Boolean(session) ? (
+                <Route path="/welcome" component={Welcome} />
+            ) : (
+                <Route
+                    path={path}
+                    render={(props) => <Component {...props} />}
+                />
+            )}
+        </>
     )
 }
 

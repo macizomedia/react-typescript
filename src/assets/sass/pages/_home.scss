@@ -1,0 +1,33 @@
+// -----------------------------------------------------------------------------
+// This file contains styles that are specific to the home page.
+// -----------------------------------------------------------------------------
+.App {
+    position: relative;
+    text-align: center;
+    color: azure;
+    display: flex;
+    flex-direction: column;
+    align-content: space-around;
+
+    &-header {
+        flex-basis: auto;
+    }
+    &-logo {
+        max-width: 500px;
+        max-height: 500px;
+    }
+
+    &-lead {
+        position: absolute;
+        top: 310px;
+        font-size: larger;
+
+            }
+
+    &-link {
+        color: chocolate;
+        &:hover {
+            color: darkcyan;
+        }
+    }
+}
